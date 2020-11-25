@@ -28,7 +28,12 @@ namespace smartschool
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options => options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddControllers();
+
+            // services.AddSingleton<IRepository, Repository>();
+            // services.AddTransient<IRepository, Repository>();
+            services.AddScoped<IRepository, Repository>();
+
+            services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

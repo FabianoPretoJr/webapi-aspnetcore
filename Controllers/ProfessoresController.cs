@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using smartschool.Data;
 using smartschool.Models;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace smartschool.Controllers
 {
@@ -9,59 +10,83 @@ namespace smartschool.Controllers
     [Route("api/[controller]")]
     public class ProfessoresController : ControllerBase
     {
-        private readonly ApplicationDbContext database;
-        public ProfessoresController(ApplicationDbContext database)
+        public readonly IRepository repo;
+
+        public ProfessoresController(IRepository repo)
         {
-            this.database = database;
+            this.repo = repo;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            var professores = database.professores.ToList();
+            var professores = repo.GetAllProfessores(true);
             return Ok(professores);
         }
 
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var professor = database.professores.First(p => p.Id == id);
+            var professor = repo.GetAlunoById(id, false);
+            if (professor == null)
+            {
+                Response.StatusCode = 400;
+                return new ObjectResult("");
+            }
             return Ok(professor);
         }
 
         [HttpPost]
         public IActionResult Post([FromBody]Professor professor)
         {
-            database.professores.Add(professor);
-            database.SaveChanges();
-            return Ok();
+            repo.Add(professor);
+            if (repo.SaveChanges())
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
 
         [HttpPatch("{id}")]
         public IActionResult Patch(int id, [FromBody]Professor professor)
         {
-            var pro = database.professores.First(p => p.Id == id);
-            pro.Nome = professor.Nome;
-            database.SaveChanges();
-            return Ok();
+            var pro = repo.GetProfessorById(id, false);
+            if (pro == null) return BadRequest();
+            
+            repo.Update(professor);
+            if (repo.SaveChanges())
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
 
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody]Professor professor)
         {
-            var pro = database.professores.First(p => p.Id == id);
-            pro.Nome = professor.Nome;
-            database.SaveChanges();
-            return Ok();
+            var pro = repo.GetProfessorById(id, false);
+            if (pro == null) return BadRequest();
+            
+            repo.Update(professor);
+            if (repo.SaveChanges())
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var professor = database.professores.First(p => p.Id == id);
-            database.professores.Remove(professor);
-            database.SaveChanges();
-            return Ok();
+            var professor = repo.GetProfessorById(id, false);
+            if (professor == null) return BadRequest();
+
+            repo.Delete(professor);
+            if (repo.SaveChanges())
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
     }
 }

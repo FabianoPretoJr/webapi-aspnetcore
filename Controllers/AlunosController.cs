@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using smartschool.Data;
 using smartschool.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace smartschool.Controllers
 {
@@ -10,16 +11,17 @@ namespace smartschool.Controllers
     [Route("api/[controller]")]
     public class AlunosController : ControllerBase
     {
-        private readonly ApplicationDbContext database;
-        public AlunosController(ApplicationDbContext database)
+        public readonly IRepository repo;
+
+        public AlunosController(IRepository repo)
         {
-            this.database = database;
+            this.repo = repo;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            var alunos = database.alunos.ToList();
+            var alunos = repo.GetAllAlunos(true);
             return Ok(alunos);
         }
 
@@ -28,7 +30,7 @@ namespace smartschool.Controllers
         {
             try
             {
-                var aluno = database.alunos.First(a => a.Id == id);
+                var aluno = repo.GetAlunoById(id, false);
                 if (aluno == null)
                 {
                     Response.StatusCode = 400;
@@ -46,40 +48,54 @@ namespace smartschool.Controllers
         [HttpPost]
         public IActionResult Post([FromBody]Aluno aluno)
         {
-            database.alunos.Add(aluno);
-            database.SaveChanges();
-            return Ok();
+            repo.Add(aluno);
+            if (repo.SaveChanges())
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
 
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody]Aluno aluno)
         {
-            var alu = database.alunos.First(a => a.Id == id);
-            alu.Nome = aluno.Nome;
-            alu.Sobrenome = aluno.Sobrenome;
-            alu.Telefone = aluno.Telefone;
-            database.SaveChanges();
-            return Ok();
+            var alu = repo.GetAlunoById(id, false);
+            if (alu == null) return BadRequest();
+            
+            repo.Update(aluno);
+            if (repo.SaveChanges())
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
 
         [HttpPatch("{id}")]
         public IActionResult Patch(int id, [FromBody]Aluno aluno)
         {
-            var alu = database.alunos.First(a => a.Id == id);
-            alu.Nome = aluno.Nome;
-            alu.Sobrenome = aluno.Sobrenome;
-            alu.Telefone = aluno.Telefone;
-            database.SaveChanges();
-            return Ok();
+            var alu = repo.GetAlunoById(id, false);
+            if (alu == null) return BadRequest();
+            
+            repo.Update(aluno);
+            if (repo.SaveChanges())
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var aluno = database.alunos.First(a => a.Id == id);
-            database.Remove(aluno);
-            database.SaveChanges();
-            return Ok();
+            var aluno = repo.GetAlunoById(id, false);
+            if (aluno == null) return BadRequest();
+
+            repo.Delete(aluno);
+            if (repo.SaveChanges())
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
     }
 }
