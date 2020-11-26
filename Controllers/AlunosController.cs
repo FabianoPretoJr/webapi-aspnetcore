@@ -1,9 +1,10 @@
 using System;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using smartschool.Data;
 using smartschool.Models;
-using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using System.Collections.Generic;
+using smartschool.DTO;
 
 namespace smartschool.Controllers
 {
@@ -12,17 +13,20 @@ namespace smartschool.Controllers
     public class AlunosController : ControllerBase
     {
         public readonly IRepository repo;
+        public IMapper Mapper { get; }
 
-        public AlunosController(IRepository repo)
+        public AlunosController(IRepository repo, IMapper mapper)
         {
             this.repo = repo;
+            this.Mapper = mapper;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
             var alunos = repo.GetAllAlunos(true);
-            return Ok(alunos);
+
+            return Ok(Mapper.Map<IEnumerable<AlunoDTO>>(alunos));
         }
 
         [HttpGet("{id}")]
@@ -36,7 +40,10 @@ namespace smartschool.Controllers
                     Response.StatusCode = 400;
                     return new ObjectResult("");
                 }
-                return Ok(aluno);
+
+                var alunoDTO = Mapper.Map<AlunoDTO>(aluno);
+
+                return Ok(alunoDTO);
             }
             catch (Exception)
             {
@@ -46,40 +53,46 @@ namespace smartschool.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody]Aluno aluno)
+        public IActionResult Post([FromBody]AlunoRegistrarDTO model)
         {
+            var aluno = Mapper.Map<Aluno>(model);
+
             repo.Add(aluno);
             if (repo.SaveChanges())
             {
-                return Ok();
+                return Created($"/api/alunos/{model.Id}", Mapper.Map<AlunoDTO>(aluno));
             }
             return BadRequest();
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody]Aluno aluno)
+        public IActionResult Put(int id, [FromBody]AlunoRegistrarDTO model)
         {
-            var alu = repo.GetAlunoById(id, false);
-            if (alu == null) return BadRequest();
+            var aluno = repo.GetAlunoById(id, false);
+            if (aluno == null) return BadRequest();
+
+            Mapper.Map(model, aluno);
             
             repo.Update(aluno);
             if (repo.SaveChanges())
             {
-                return Ok();
+                return Created($"/api/alunos/{model.Id}", Mapper.Map<AlunoDTO>(aluno));
             }
             return BadRequest();
         }
 
         [HttpPatch("{id}")]
-        public IActionResult Patch(int id, [FromBody]Aluno aluno)
+        public IActionResult Patch(int id, [FromBody]AlunoRegistrarDTO model)
         {
-            var alu = repo.GetAlunoById(id, false);
-            if (alu == null) return BadRequest();
+            var aluno = repo.GetAlunoById(id, false);
+            if (aluno == null) return BadRequest();
+
+            Mapper.Map(model, aluno);
             
             repo.Update(aluno);
             if (repo.SaveChanges())
             {
-                return Ok();
+                return Created($"/api/alunos/{model.Id}", Mapper.Map<AlunoDTO>(aluno));
             }
             return BadRequest();
         }
