@@ -5,6 +5,8 @@ using smartschool.Models;
 using AutoMapper;
 using System.Collections.Generic;
 using smartschool.DTO;
+using System.Threading.Tasks;
+using smartschool.helpers;
 
 namespace smartschool.Controllers
 {
@@ -22,11 +24,14 @@ namespace smartschool.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get([FromQuery]PageParams pageParams)
         {
-            var alunos = repo.GetAllAlunos(true);
+            var alunos = await repo.GetAllAlunosAsync(pageParams, true);
+            var alunosResult = Mapper.Map<IEnumerable<AlunoDTO>>(alunos);
 
-            return Ok(Mapper.Map<IEnumerable<AlunoDTO>>(alunos));
+            Response.AddPagination(alunos.CurrentPages, alunos.PageSize, alunos.TotalCount, alunos.TotalPages);
+
+            return Ok(alunosResult);
         }
 
         [HttpGet("{id}")]

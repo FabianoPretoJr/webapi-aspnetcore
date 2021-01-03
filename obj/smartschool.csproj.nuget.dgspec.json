@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\FOEU\\My Private Documents\\Udemy\\ASPNET Core - web api\\smartschool\\smartschool.csproj": {}
+    "C:\\Users\\FOEU\\My Private Documents\\Udemy\\ASPNET Core - WebApi\\smartschool\\smartschool.csproj": {}
   },
   "projects": {
-    "C:\\Users\\FOEU\\My Private Documents\\Udemy\\ASPNET Core - web api\\smartschool\\smartschool.csproj": {
+    "C:\\Users\\FOEU\\My Private Documents\\Udemy\\ASPNET Core - WebApi\\smartschool\\smartschool.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\FOEU\\My Private Documents\\Udemy\\ASPNET Core - web api\\smartschool\\smartschool.csproj",
+        "projectUniqueName": "C:\\Users\\FOEU\\My Private Documents\\Udemy\\ASPNET Core - WebApi\\smartschool\\smartschool.csproj",
         "projectName": "smartschool",
-        "projectPath": "C:\\Users\\FOEU\\My Private Documents\\Udemy\\ASPNET Core - web api\\smartschool\\smartschool.csproj",
+        "projectPath": "C:\\Users\\FOEU\\My Private Documents\\Udemy\\ASPNET Core - WebApi\\smartschool\\smartschool.csproj",
         "packagesPath": "C:\\Users\\FOEU\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\FOEU\\My Private Documents\\Udemy\\ASPNET Core - web api\\smartschool\\obj\\",
+        "outputPath": "C:\\Users\\FOEU\\My Private Documents\\Udemy\\ASPNET Core - WebApi\\smartschool\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\FOEU\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -56,7 +56,7 @@
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
-              "version": "[5.6.3, )"
+              "version": "[5.4.1, )"
             }
           },
           "imports": [
